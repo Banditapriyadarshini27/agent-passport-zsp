@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent-Passport // Core Security Architecture & Learning Manual</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #030508;
+      --panel-bg: rgba(9, 13, 22, 0.7);
+      --border-color: rgba(255, 255, 255, 0.05);
+      --text-main: #d1d7e5;
+      --text-muted: #8a99ad;
+      
+      /* Neon Accent Palettes */
+      --cyan: #00e5ff;
+      --green: #00f5a0;
+      --purple: #d132ff;
+      --red: #ff3b69;
+      --amber: #ffb800;
+      
+      --font-display: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-display);
+      line-height: 1.6;
+      background-image: 
+        linear-gradient(to right, rgba(0, 229, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 229, 255, 0.01) 1px, transparent 1px);
+      background-size: 30px 30px;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan);
+    }
+
+    header {
+      background: linear-gradient(180deg, rgba(9, 13, 22, 0.95) 0%, rgba(3, 5, 8, 0.9) 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 10%;
+      width: 80%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0.8rem;
+    }
+
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      border: 1px solid rgba(0, 229, 255, 0.25);
+      background: rgba(0, 229, 255, 0.04);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 2.2rem;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      max-width: 1300px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      gap: 2.5rem;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      position: sticky;
+      top: 2rem;
+      height: fit-content;
+    }
+
+    .nav-box {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-title {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.5rem;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .nav-link.active {
+      color: var(--cyan);
+      background: rgba(0, 229, 255, 0.05);
+      border-left: 3px solid var(--cyan);
+    }
+
+    .nav-link span.icon {
+      font-size: 1.1rem;
+    }
+
+    /* Main Content */
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    section {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.3s ease;
+    }
+
+    section:hover {
+      border-color: rgba(0, 229, 255, 0.1);
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      color: #fff;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.8rem;
+    }
+
+    h2 span.num {
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    p {
+      margin-bottom: 1.2rem;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    strong {
+      color: #fff;
+    }
+
+    /* Code blocks */
+    pre {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.2rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    .code-keyword { color: #f43f5e; }
+    .code-string { color: #34d399; }
+    .code-comment { color: #64748b; font-style: italic; }
+    .code-function { color: #38bdf8; }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.05rem;
+      color: #fff;
+    }
+
+    .feature-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0;
+    }
+
+    /* Steps cards */
+    .step-card {
+      border-left: 3px solid var(--purple);
+      padding-left: 1.2rem;
+      margin: 1.5rem 0;
+    }
+
+    .step-card.cyan { border-left-color: var(--cyan); }
+    .step-card.green { border-left-color: var(--green); }
+    .step-card.red { border-left-color: var(--red); }
+    .step-card.amber { border-left-color: var(--amber); }
+
+    .step-card h4 {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Q&A Block */
+    .qa-block {
+      margin-top: 1.5rem;
+    }
+
+    .qa-item {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      padding-bottom: 1.2rem;
+    }
+
+    .qa-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .qa-question {
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.6rem;
+      font-size: 0.95rem;
+    }
+
+    .qa-answer {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.015);
+      border-left: 2px solid var(--cyan);
+      padding: 0.8rem 1rem;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .tunnel-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .tunnel-step {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      padding: 1.2rem;
+      border-radius: 8px;
+    }
+
+    .tunnel-step h4 {
+      color: var(--cyan);
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      font-family: var(--font-mono);
+    }
+
+    .tunnel-step p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .tunnel-step pre {
+      margin: 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: relative;
+        top: 0;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <span class="badge">SECURE ADK</span>
+      <span class="badge">ZSP PORTAL</span>
+    </div>
+    <h1>Agent-Passport Architecture & Learning Manual</h1>
+    <div class="subtitle">Complete guide covering system operations, core learning components, interview preparation, and deployment guides.</div>
+  </header>
+
+  <div class="layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="nav-box">
+        <div class="nav-title">Navigation</div>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="#overview" class="nav-link active" onclick="setActiveLink(this)">
+              <span class="icon">🔍</span>
+              <span>Overview</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#accomplished" class="nav-link" onclick="setActiveLink(this)">
+              <span class="icon">⚡</span>
+              <span>What We Did</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#pillars" class="nav-link" onclick="setActiveLink(this)">
+              <span class="icon">🧱</span>
+              <span>Security Pillars</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#tunneling" class="nav-link" onclick="setActiveLink(this)">
+              <span class="icon">🌐</span>
+              <span>Public Tunneling</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#interview" class="nav-link" onclick="setActiveLink(this)">
+              <span class="icon">🏆</span>
+              <span>Interview Playbook</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      
+      <!-- Section 1: System Overview -->
+      <section id="overview">
+        <h2><span class="num">01.</span> Project & Architectural Overview</h2>
+        <p>
+          <strong>Agent-Passport</strong> is a state-of-the-art **Zero-Standing-Privilege (ZSP)** identity and security governance middleware designed specifically for multi-agent AI ecosystems. 
+        </p>
+        <p>
+          AI agents running autonomous workflows often require access to host resources (filesystems, shells, and web search APIs). If an agent is compromised via a prompt injection attack, standing keys or execution permissions can be permanently hijacked. Agent-Passport solves this by removing all standing credentials from the agent, enforcing real-time checkout validation, and intercepting direct tool calls.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h3>🛡️ ZSP Registry</h3>
+            <p>In-memory registry that issues time-restricted, single-use passport tokens (TTL) for approved commands.</p>
+          </div>
+          <div class="feature-card">
+            <h3>🔗 Runtime Hook</h3>
+            <p>Overrides Node's core spawn systems at runtime, blocking direct command executions bypassing the gateway.</p>
+          </div>
+          <div class="feature-card">
+            <h3>🧩 MCP Gateway</h3>
+            <p>An Express server acting as a secure gateway verifying hash chains, rate bounds, and payload content.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: What We Accomplished -->
+      <section id="accomplished">
+        <h2><span class="num">02.</span> Technical Milestones Accomplished</h2>
+        <p>
+          Throughout this project, we built a robust secure intercept layer and a highly interactive, responsive administrative dashboard:
+        </p>
+        <div class="step-card green">
+          <h4>Backend Privileged Interception & Containment Layer</h4>
+          <p>
+            Developed the core intercept script in <a href="file:///c:/Users/bandi/OneDrive/capstone/agent-passport/backend/antigravity/hook.js" style="color: var(--cyan); text-decoration: none; font-family: var(--font-mono);">hook.js</a>. It monkey-patches direct tool invocations, forcing all requests to route through the validation gateway. Implemented time-to-live sweeps in <a href="file:///c:/Users/bandi/OneDrive/capstone/agent-passport/backend/registry/passport.js" style="color: var(--cyan); text-decoration: none; font-family: var(--font-mono);">passport.js</a> that invalidate tokens the second their TTL hits zero.
+          </p>
+        </div>
+        <div class="step-card purple">
+          <h4>Payload Security Validation & Behavior Auditing</h4>
+          <p>
+            Added a baseline behavior evaluation mapping and an anomaly checking engine inside the gateway. The server checks command inputs for SQL/shell injections (such as recursive deletion scripts `rm -rf`) and path traversals, dropping bad requests, purging keys, and broadcasting critical telemetry alerts.
+          </p>
+        </div>
+        <div class="step-card cyan">
+          <h4>Vite + React Dashboard Visual Command Center</h4>
+          <p>
+            Created a dynamic frontend using HSL colors, Orbitron fonts, and an animated particle topology canvas in <a href="file:///c:/Users/bandi/OneDrive/capstone/agent-passport/frontend/src/components/InteractiveTopologyGrid.jsx" style="color: var(--cyan); text-decoration: none; font-family: var(--font-mono);">InteractiveTopologyGrid.jsx</a>. Built a mechanical slide-to-unlock sliding master Kill Switch, stacking toast notification queue, sliding drawers, and clean structured audit ledgers.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 3: Core Learning Pillars -->
+      <section id="pillars">
+        <h2><span class="num">03.</span> The Security & Coding Pillars</h2>
+        <p>
+          To understand this project in-depth, learn about these five core pillars:
+        </p>
+
+        <div class="step-card cyan">
+          <h4>1. Zero-Standing-Privilege (ZSP)</h4>
+          <p>
+            ZSP is the design pattern of **never granting permanent permissions**. When the simulation requestor agent attempts to run a file search, it does not possess the execution keys. It makes a POST request to `/mcp/checkout`. The server validates policies and returns an ephemeral (e.g., 5-second) token. The agent must present this token at `/mcp/execute`. Once validated and used, it vanishes.
+          </p>
+        </div>
+
+        <div class="step-card purple">
+          <h4>2. Process-Level Monkey Patching (Hooks)</h4>
+          <p>
+            To catch rogue agents attempting direct tool calls, we intercept executions. In Javascript, this is accomplished by monkey-patching:
+          </p>
+          <pre><code><span class="code-comment">// Example monkey patching hook</span>
+<span class="code-keyword">const</span> originalSpawn = require(<span class="code-string">'child_process'</span>).spawn;
+require(<span class="code-string">'child_process'</span>).spawn = <span class="code-keyword">function</span>(<span class="code-function">cmd, args, options</span>) {
+  <span class="code-keyword">if</span> (!options || !options.env || !options.env.GATEWAY_TOKEN) {
+    <span class="code-keyword">throw new</span> Error(<span class="code-string">"SECURITY EXCEPTION: Direct spawn blocked by Antigravity Hook!"</span>);
+  }
+  <span class="code-keyword">return</span> originalSpawn(<span class="code-function">cmd, args, options</span>);
+};</code></pre>
+        </div>
+
+        <div class="step-card green">
+          <h4>3. Command Injection & Path Traversal Containment</h4>
+          <p>
+            Agents must be prevented from traversing out of their workspace (e.g. using `../../`). The Governance agent resolves paths dynamically:
+          </p>
+          <pre><code><span class="code-comment">// Path Containment check</span>
+<span class="code-keyword">const</span> path = require(<span class="code-string">'path'</span>);
+<span class="code-keyword">function</span> <span class="code-function">validatePath</span>(targetPath, workspaceRoot) {
+  <span class="code-keyword">const</span> resolved = path.resolve(targetPath);
+  <span class="code-keyword">return</span> resolved.startsWith(path.resolve(workspaceRoot));
+}</code></pre>
+        </div>
+
+        <div class="step-card red">
+          <h4>4. WebSockets for Live Telemetry</h4>
+          <p>
+            Dashboard notifications and topology flow lines are driven by full-duplex WebSocket connections. The backend pushes updates (type: `registry_update`, `threat_alert`, `request_pulse`) instantly, avoiding server polling and maintaining dashboard responsiveness.
+          </p>
+        </div>
+
+        <div class="step-card amber">
+          <h4>5. 2D HTML5 Canvas Animation & Physics</h4>
+          <p>
+            Instead of standard DOM overlays, the topology grid runs on HTML5 Canvas. The coordinate translations handle drag-panning and scroll-wheel scaling zoom. A warping math formula calculated inside `requestAnimationFrame` creates dynamic grid deformations around the user's cursor.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 4: Public URL & Hosting Guide -->
+      <section id="tunneling">
+        <h2><span class="num">04.</span> Exposing via Public URL & Free Hosting</h2>
+        <p>
+          To share your dashboard live with judges or other teams, you need a public URL. You can deploy it permanently for free on **Hugging Face Spaces** or use temporary local tunnels.
+        </p>
+
+        <h3 style="color: #fff; margin-top: 1.5rem; margin-bottom: 0.8rem; font-size: 1.15rem;">🚀 Method A: Free Permanent Hosting on Hugging Face Spaces (Recommended)</h3>
+        <p>
+          Hugging Face Spaces allows you to host full-stack apps inside a Docker container for free. Because we configured our backend to serve the static frontend on a single port (port 7860 on HF) and enabled dynamic address resolution, the app will deploy automatically with a permanent HTTPS link.
+        </p>
+
+        <div class="tunnel-container">
+          <div class="tunnel-step">
+            <h4>Step 1: Create a Hugging Face Space</h4>
+            <p>Go to <a href="https://huggingface.co/new-space" target="_blank" style="color: var(--cyan); text-decoration: none;">huggingface.co/new-space</a>. Choose a name, select <strong>Docker</strong> as the SDK, and choose <strong>Blank</strong> as the template. Keep the space public.</p>
+          </div>
+
+          <div class="tunnel-step">
+            <h4>Step 2: Check the Root Dockerfile</h4>
+            <p>We created a root <code>Dockerfile</code> at the base of your project. It compiles your frontend code, copies the static build into the backend assets directory, and launches Express on port 7860. The file contents are:</p>
+            <pre><code><span class="code-comment"># Build Stage for Frontend</span>
+<span class="code-keyword">FROM</span> node:20-alpine <span class="code-keyword">AS</span> frontend-builder
+<span class="code-keyword">WORKDIR</span> /frontend
+<span class="code-keyword">COPY</span> frontend/package*.json ./
+<span class="code-keyword">RUN</span> npm install
+<span class="code-keyword">COPY</span> frontend/ .
+<span class="code-keyword">RUN</span> npm run build
+
+<span class="code-comment"># Final Run Stage</span>
+<span class="code-keyword">FROM</span> node:20-alpine
+<span class="code-keyword">WORKDIR</span> /app
+<span class="code-keyword">COPY</span> backend/package*.json ./
+<span class="code-keyword">RUN</span> npm install --production
+<span class="code-keyword">COPY</span> backend/ .
+<span class="code-keyword">COPY</span> --from=frontend-builder /frontend/dist ./frontend/dist
+<span class="code-keyword">ENV</span> PORT=7860
+<span class="code-keyword">EXPOSE</span> 7860
+<span class="code-keyword">CMD</span> [<span class="code-string">"npm"</span>, <span class="code-string">"start"</span>]</code></pre>
+          </div>
+
+          <div class="tunnel-step">
+            <h4>Step 3: Push Files to Hugging Face</h4>
+            <p>Initialize a Git repository inside your capstone folder and push all files directly to your Hugging Face Space repository:</p>
+            <pre><code>git init
+git remote add hf https://huggingface.co/spaces/YOUR_USERNAME/YOUR_SPACE_NAME
+git add .
+git commit -m "Deploy Agent-Passport ZSP to Spaces"
+git push -u hf main</code></pre>
+            <p><em>Hugging Face will automatically build your container and give you a permanent public URL (e.g., <code>https://huggingface.co/spaces/username/spacename</code>).</em></p>
+          </div>
+        </div>
+
+        <h3 style="color: #fff; margin-top: 2rem; margin-bottom: 0.8rem; font-size: 1.15rem;">🔗 Method B: Temporary Local Tunneling (Localtunnel)</h3>
+        <p>If you prefer running it locally and exposing it temporarily:</p>
+        <div class="tunnel-container">
+          <div class="tunnel-step">
+            <h4>Step 1: Expose the Backend</h4>
+            <pre><code>lt --port 4000</code></pre>
+            <p><em>Note down the backend URL (e.g. <code>https://my-backend.loca.lt</code>) and set it in your code.</em></p>
+          </div>
+
+          <div class="tunnel-step">
+            <h4>Step 2: Expose the Frontend</h4>
+            <pre><code>lt --port 5173</code></pre>
+            <p><em>Access your dashboard at the generated frontend localtunnel URL.</em></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 5: Interview Playbook -->
+      <section id="interview">
+        <h2><span class="num">05.</span> Interview Q&A Playbook</h2>
+        <div class="qa-block">
+          
+          <div class="qa-item">
+            <div class="qa-question">Q: Why is Zero Standing Privilege (ZSP) better than static administrative keys for AI agents?</div>
+            <div class="qa-answer">
+              Static administrative credentials represents a massive attack surface. If an agent is compromised via a recursive prompt injection exploit, the attacker gains full, permanent access. With ZSP, credentials are issued on-demand, limited to a specific action (e.g. read_file), and expire immediately after use. This minimizes the risk of credentials hijacking.
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="qa-question">Q: How does the process hook actually intercept system spawns?</div>
+            <div class="qa-answer">
+              The process hook overrides node wrappers at runtime. Whenever a script attempts to invoke a shell command, the hook evaluates the environment parameters. If it doesn't detect a security token issued by the gateway, the hook intercepts the stream, halts execution, and reports a critical threat payload event.
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="qa-question">Q: What happens if an agent attempts directory traversal (e.g. `../../etc/passwd`)?</div>
+            <div class="qa-answer">
+              The Governance evaluation parses path strings using resolve metrics. If the resolved path points outside the designated workspace path boundary, the authorization fails, the checkout is rejected, and a governance violation alert is broadcast.
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="qa-question">Q: Why draw the network topology in canvas instead of D3 or React-Flow?</div>
+            <div class="qa-answer">
+              Performance. Rending particle streams and cursor-warp grid deformations at 60 FPS in SVG or DOM elements creates significant lagging. Direct 2D Canvas rendering has near-zero overhead and can handle rich shadow glows smoothly.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    AGENT-PASSPORT LABS // SECURITY MIDDLEWARE DEVELOPMENT MANUAL
+  </footer>
+
+  <script>
+    function setActiveLink(clickedLink) {
+      const links = document.querySelectorAll('.nav-link');
+      links.forEach(l => l.classList.remove('active'));
+      clickedLink.classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg-color: #05070a;
+  --bg-grid-color: rgba(0, 229, 255, 0.015);
+  --panel-bg: rgba(9, 13, 22, 0.65);
+  --panel-bg-solid: #090d16;
+  --border-color: rgba(255, 255, 255, 0.04);
+  
+  /* HSL Tailored Colors */
+  --color-green: 159, 100%, 48%;     /* #00f5a0 - Approved */
+  --color-red: 346, 100%, 62%;       /* #ff3b69 - Threat */
+  --color-cyan: 186, 100%, 50%;      /* #00e5ff - Gateway */
+  --color-purple: 284, 100%, 60%;    /* #d132ff - Governance */
+  --color-amber: 43, 100%, 50%;      /* #ffb800 - Warning */
+  
+  --font-display: 'Orbitron', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: #cfd6e4;
+  font-family: var(--font-sans);
+  overflow: hidden;
+  height: 100vh;
+  /* Premium Minimalistic Grid Background */
+  background-image: 
+    linear-gradient(to right, var(--bg-grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid-color) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+/* Custom Scrollbars - Thin & Modern */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.25);
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.35);
+  transition: var(--transition-smooth);
+}
+
+.glass-panel:hover {
+  border-color: rgba(0, 229, 255, 0.1);
+  box-shadow: 0 6px 24px 0 rgba(0, 229, 255, 0.02);
+}
+
+/* Glow Borders */
+.glow-cyan {
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.08);
+  border-color: hsla(var(--color-cyan), 0.2);
+}
+
+.glow-red {
+  box-shadow: 0 0 15px rgba(255, 59, 105, 0.15);
+  border-color: hsla(var(--color-red), 0.25);
+  animation: borderPulseRed 2s infinite alternate;
+}
+
+.glow-green {
+  box-shadow: 0 0 12px rgba(0, 245, 160, 0.1);
+  border-color: hsla(var(--color-green), 0.2);
+}
+
+/* Status Dot */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.cyan { background-color: hsl(var(--color-cyan)); box-shadow: 0 0 6px hsl(var(--color-cyan)); }
+.status-dot.green { background-color: hsl(var(--color-green)); box-shadow: 0 0 6px hsl(var(--color-green)); }
+.status-dot.red { background-color: hsl(var(--color-red)); box-shadow: 0 0 6px hsl(var(--color-red)); }
+.status-dot.purple { background-color: hsl(var(--color-purple)); box-shadow: 0 0 6px hsl(var(--color-purple)); }
+.status-dot.amber { background-color: hsl(var(--color-amber)); box-shadow: 0 0 6px hsl(var(--color-amber)); }
+
+/* Animations */
+@keyframes borderPulseRed {
+  0% { border-color: hsla(var(--color-red), 0.15); box-shadow: 0 0 8px rgba(255, 59, 105, 0.05); }
+  100% { border-color: hsla(var(--color-red), 0.45); box-shadow: 0 0 18px rgba(255, 59, 105, 0.2); }
+}
+
+@keyframes threatAlertFlash {
+  0% { background: rgba(255, 59, 105, 0.02); }
+  50% { background: rgba(255, 59, 105, 0.1); }
+  100% { background: rgba(255, 59, 105, 0.02); }
+}
+
+.alert-flash {
+  animation: threatAlertFlash 1.5s infinite;
+}
+
+.font-mono-custom {
+  font-family: var(--font-mono);
+}
+
+.font-display-custom {
+  font-family: var(--font-display);
+}
+
+.left-panel {
+  padding-left: 16px;
+  min-width: 0;
+  overflow: hidden;
+}
+
