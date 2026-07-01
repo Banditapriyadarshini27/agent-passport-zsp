@@ -85,6 +85,9 @@ const StatCard = ({ label, value, color }) => (
 );
 
 export function App() {
+  const [showLanding, setShowLanding] = useState(true);
+  const [focusSection, setFocusSection] = useState(null);
+
   // Live Counters
   const [activeAgents, setActiveAgents] = useState(0);
   const [blockedAnomalies, setBlockedAnomalies] = useState(0);
@@ -312,6 +315,16 @@ export function App() {
     return () => clearInterval(cooldownTimerRef.current);
   }, [cooldown]);
 
+  useEffect(() => {
+    if (focusSection) {
+      const timer = setTimeout(() => {
+        setFocusSection(null);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [focusSection]);
+
+
   const addToast = (title, message, severity = 'info') => {
     const newToast = {
       id: `toast_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
@@ -492,595 +505,769 @@ export function App() {
       {/* Toast Notification Container */}
       <ToastSystem toasts={toasts} onDismiss={handleDismissToast} />
 
-      {/* Header */}
-      <header style={{ padding: '16px 0 0 0' }}>
-        <h1 style={{
-          textAlign: 'center',
-          fontFamily: "'Orbitron', sans-serif",
-          fontSize: '28px',
-          fontWeight: 900,
-          color: '#00e5ff',
-          textShadow: '0 0 20px rgba(0,230,255,0.4)',
-          letterSpacing: '4px',
-          width: '100%',
-          marginBottom: '20px'
-        }}>
-          AGENT-PASSPORT ZSP GATEWAY
-        </h1>
-      </header>
-
-      {/* Main Grid Content Area */}
-      <main style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '12px',
-        padding: '12px',
-        height: 'calc(100vh - 60px)',
-        overflow: 'hidden'
-      }}>
-        
-        {/* Left Column */}
-        <section className="left-panel" style={{
+      {showLanding ? (
+        <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
           height: '100%',
-          overflow: 'hidden'
+          width: '100%',
+          position: 'relative',
+          padding: '24px',
+          boxSizing: 'border-box'
         }}>
-          {/* Stats Cards Row */}
+          {/* Corner brackets */}
+          <div className="corner-bracket corner-bracket-tl" />
+          <div className="corner-bracket corner-bracket-tr" />
+          <div className="corner-bracket corner-bracket-bl" />
+          <div className="corner-bracket corner-bracket-br" />
+
+          {/* Pill Container */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '12px',
-            marginBottom: '16px'
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 20px',
+            borderRadius: '100px',
+            backgroundColor: 'rgba(9, 13, 22, 0.45)',
+            border: '1px solid rgba(0, 229, 255, 0.22)',
+            boxShadow: '0 0 15px rgba(0, 229, 255, 0.08)',
+            marginBottom: '32px',
           }}>
-            <StatCard label="Active Agents" value={activeAgents} color="#00e5ff"/>
-            <StatCard label="Blocked Attacks" value={blockedAnomalies} color="#ff0055"/>
-            <StatCard label="Credentials Revoked" value={credentialsRevoked} color="#ffaa00"/>
-            <StatCard label="System Health" value={systemHealth + '%'} color={healthColor}/>
+            <span className="status-dot green pulsing-dot-green"></span>
+            <span style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '11px',
+              fontWeight: '500',
+              color: 'rgba(0, 229, 255, 0.85)',
+              letterSpacing: '2px',
+              textTransform: 'uppercase'
+            }}>
+              SYSTEM ACTIVE · ZERO STANDING PRIVILEGE
+            </span>
           </div>
 
-          {/* Node Graph Viewport */}
-          <div className="glass-panel" style={{
-            flex: 1,
-            height: '100%',
-            minHeight: 0,
+          {/* Large Title */}
+          <h1 style={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '64px',
+            fontWeight: '900',
+            letterSpacing: '1px',
+            marginBottom: '12px',
+            color: '#ffffff',
             display: 'flex',
-            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '2px',
+            textAlign: 'center'
+          }}>
+            <span>Agent-</span>
+            <span style={{
+              color: '#00e5ff',
+              textShadow: '0 0 25px rgba(0, 229, 255, 0.4)'
+            }}>Passport</span>
+            <span style={{ marginLeft: '12px' }}>ZSP</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p style={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '13px',
+            fontWeight: '700',
+            color: '#8a99ad',
+            letterSpacing: '5px',
+            textTransform: 'uppercase',
+            marginBottom: '48px',
+            textAlign: 'center',
+            opacity: 0.85
+          }}>
+            GOVERNANCE MIDDLEWARE FOR MULTI-AGENT AI
+          </p>
+
+          {/* Interactive Buttons Row */}
+          <div style={{
+            display: 'flex',
+            gap: '16px',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: '80px',
+            maxWidth: '90%'
+          }}>
+            <button 
+              className="btn-landing btn-landing-cyan"
+              onClick={() => {
+                setFocusSection('tokens');
+                setShowLanding(false);
+              }}
+            >
+              Ephemeral Tokens
+            </button>
+            <button 
+              className="btn-landing btn-landing-green"
+              onClick={() => {
+                setFocusSection('ledger');
+                setShowLanding(false);
+              }}
+            >
+              Live Audit Ledger
+            </button>
+            <button 
+              className="btn-landing btn-landing-red"
+              onClick={() => {
+                setFocusSection('alerts');
+                setShowLanding(false);
+              }}
+            >
+              Threat Detection
+            </button>
+            <button 
+              className="btn-landing btn-landing-amber"
+              onClick={() => {
+                setFocusSection('kill');
+                setIsUnlocked(true);
+                setShowLanding(false);
+              }}
+            >
+              Kill Switch
+            </button>
+          </div>
+
+          {/* Bottom Footer URL */}
+          <div style={{
+            position: 'absolute',
+            bottom: '40px',
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '11px',
+            color: 'rgba(138, 153, 173, 0.45)',
+            letterSpacing: '1px'
+          }}>
+            boondi-agentpassport.hf.space
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <header style={{ padding: '16px 0 0 0', position: 'relative' }}>
+            <button 
+              onClick={() => setShowLanding(true)}
+              style={{
+                position: 'absolute',
+                left: '24px',
+                top: '20px',
+                background: 'transparent',
+                border: '1px solid rgba(0, 229, 255, 0.25)',
+                borderRadius: '4px',
+                color: '#00e5ff',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '10px',
+                padding: '6px 12px',
+                cursor: 'pointer',
+                letterSpacing: '1px',
+                transition: 'all 0.2s ease',
+                zIndex: 50
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'rgba(0, 229, 255, 0.08)';
+                e.target.style.boxShadow = '0 0 10px rgba(0, 229, 255, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              ⌂ GATEWAY
+            </button>
+            <h1 style={{
+              textAlign: 'center',
+              fontFamily: "'Orbitron', sans-serif",
+              fontSize: '28px',
+              fontWeight: 900,
+              color: '#00e5ff',
+              textShadow: '0 0 20px rgba(0,230,255,0.4)',
+              letterSpacing: '4px',
+              width: '100%',
+              marginBottom: '20px'
+            }}>
+              AGENT-PASSPORT ZSP GATEWAY
+            </h1>
+          </header>
+
+          {/* Main Grid Content Area */}
+          <main style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '12px',
+            padding: '12px',
+            height: 'calc(100vh - 60px)',
             overflow: 'hidden'
           }}>
-            <div className="border-b border-white/5 px-4 py-2 bg-white/[0.01]">
-              <h2 className="text-[10px] uppercase tracking-wider text-slate-400" style={{ fontFamily: "'Orbitron', sans-serif" }}>
-                Interactive Viewport
-              </h2>
-            </div>
-            <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
-              <InteractiveTopologyGrid 
-                lastPulse={lastPulse} 
-                systemStatus={systemStatus}
-                onNodeClick={setSelectedNodeId} 
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Right Column */}
-        <section className="right-panel" style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          gap: '8px',
-          overflow: 'hidden'
-        }}>
-          {/* Audit Ledger */}
-          <div className="glass-panel" style={{
-            flex: '1',
-            maxHeight: '33%',
-            overflowY: 'auto',
-            padding: '12px',
-            minHeight: 0,
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <KineticAlerts anomalies={anomalies} />
-          </div>
-
-          {/* Passport Registry */}
-          <div className="glass-panel" style={{
-            flex: '1',
-            maxHeight: '33%',
-            overflowY: 'auto',
-            padding: '12px',
-            minHeight: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            boxSizing: 'border-box'
-          }}>
-            <div className="border-b border-white/5 pb-2 mb-2">
-              <h3 className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold" style={{ fontFamily: "'Orbitron', sans-serif" }}>
-                Active Passport Registry State
-              </h3>
-            </div>
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              {registryEntries.length === 0 ? (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '8px',
-                  padding: '12px'
-                }}>
-                  {[
-                    { label: 'POLICY VERSION', value: 'v1.0', color: '#00e5ff' },
-                    { label: 'SANDBOX', value: 'ISOLATED', color: '#00f5a0' },
-                    { label: 'AUDIT CHAIN', value: 'SHA-256', color: '#00e5ff' },
-                    { label: 'TTL DAEMON', value: 'ACTIVE', color: '#00f5a0' },
-                    { label: 'RATE LIMIT', value: '10/min', color: '#ffaa00' },
-                    { label: 'SYSTEM ENV', value: 'SECURE ADK', color: '#00e5ff' },
-                  ].map((item, i) => (
-                    <div key={i} style={{
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      borderRadius: '6px',
-                      padding: '10px 12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px'
-                    }}>
-                      <span style={{
-                        fontFamily: 'JetBrains Mono',
-                        fontSize: '9px',
-                        color: 'rgba(255,255,255,0.3)',
-                        letterSpacing: '1px'
-                      }}>{item.label}</span>
-                      <span style={{
-                        fontFamily: 'Orbitron',
-                        fontSize: '12px',
-                        color: item.color,
-                        fontWeight: '700'
-                      }}>{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <table style={{
-                  width: '100%',
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: '11px',
-                  borderCollapse: 'collapse'
-                }}>
-                  <thead>
-                    <tr style={{color: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(255,255,255,0.08)'}}>
-                      <th style={{padding: '8px', textAlign:'left'}}>TOKEN REF</th>
-                      <th style={{padding: '8px', textAlign:'left'}}>AGENT ID</th>
-                      <th style={{padding: '8px', textAlign:'left'}}>TOOL TARGET</th>
-                      <th style={{padding: '8px', textAlign:'left'}}>TTL</th>
-                      <th style={{padding: '8px', textAlign:'left'}}>STATUS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {registryEntries.map((entry, i) => (
-                      <tr key={i} style={{
-                        borderBottom: '1px solid rgba(255,255,255,0.04)',
-                        color: entry.status === 'AUTHORIZED'
-                          ? '#00f5a0'
-                          : '#ffaa00'
-                      }}>
-                        <td style={{padding: '8px'}}>{entry.tokenRef}</td>
-                        <td style={{padding: '8px'}}>{entry.agentId}</td>
-                        <td style={{padding: '8px'}}>{entry.toolTarget}</td>
-                        <td style={{padding: '8px'}}>
-                          {entry.expiresAt ? (
-                            <EphemeralTimer expiresAt={entry.expiresAt} />
-                          ) : (
-                            entry.ttl
-                          )}
-                        </td>
-                        <td style={{padding: '8px'}}>{entry.status}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
-
-          {/* Section 3 - Control Buttons Panel */}
-          <div className="glass-panel" style={{
-            flex: '1',
-            maxHeight: '33%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: '14px 16px',
-            border: '1px solid rgba(0,230,255,0.3)',
-            borderRadius: '10px',
-            background: 'rgba(255,0,85,0.04)',
-            minHeight: 0,
-            boxSizing: 'border-box'
-          }}>
-            {/* Header */}
-            <div style={{
+            
+            {/* Left Column */}
+            <section className="left-panel" style={{
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              borderBottom: '1px solid rgba(19, 118, 131, 0.15)',
-              paddingBottom: '8px',
-              marginBottom: '10px'
+              flexDirection: 'column',
+              gap: '12px',
+              height: '100%',
+              overflow: 'hidden'
             }}>
-              <span style={{
-                fontFamily: 'Orbitron',
-                fontSize: '11px',
-                color: '#cec2c6',
-                letterSpacing: '2px',
-                fontWeight: '700'
+              {/* Stats Cards Row */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '12px',
+                marginBottom: '16px'
               }}>
-                ⚡ MASTER REVOCATION TERMINAL
-              </span>
-              
-              {isShutdown ? (
-                <span style={{
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: '10px',
-                  padding: '3px 10px',
-                  border: '1px solid rgba(255,0,85,0.3)',
-                  borderRadius: '4px',
-                  color: '#ff0055',
-                  letterSpacing: '1px'
-                }}>
-                  🚨 SHIELD DEAD
-                </span>
-              ) : isUnlocked ? (
-                <span style={{
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: '10px',
-                  padding: '3px 10px',
-                  border: '1px solid rgba(255,170,0,0.3)',
-                  borderRadius: '4px',
-                  color: '#ffaa00',
-                  letterSpacing: '1px'
-                }}>
-                  ⚠ SYSTEM ARMED
-                </span>
-              ) : (
-                <span style={{
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: '10px',
-                  padding: '3px 10px',
-                  border: '1px solid rgba(0,245,160,0.3)',
-                  borderRadius: '4px',
-                  color: '#00f5a0',
-                  letterSpacing: '1px'
-                }}>
-                  🛡 SHIELD ENGAGED
-                </span>
-              )}
-            </div>
+                <StatCard label="Active Agents" value={activeAgents} color="#00e5ff"/>
+                <StatCard label="Blocked Attacks" value={blockedAnomalies} color="#ff0055"/>
+                <StatCard label="Credentials Revoked" value={credentialsRevoked} color="#ffaa00"/>
+                <StatCard label="System Health" value={systemHealth + '%'} color={healthColor}/>
+              </div>
 
-            {/* Buttons row */}
-            <div style={{
+              {/* Node Graph Viewport */}
+              <div className={`glass-panel ${focusSection === 'ledger' ? 'focus-highlight-green' : ''}`} style={{
+                flex: 1,
+                height: '100%',
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden'
+              }}>
+                <div className="border-b border-white/5 px-4 py-2 bg-white/[0.01]">
+                  <h2 className="text-[10px] uppercase tracking-wider text-slate-400" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+                    Interactive Viewport
+                  </h2>
+                </div>
+                <div style={{ flex: 1, height: '100%', minHeight: 0 }}>
+                  <InteractiveTopologyGrid 
+                    lastPulse={lastPulse} 
+                    systemStatus={systemStatus}
+                    onNodeClick={setSelectedNodeId} 
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Right Column */}
+            <section className="right-panel" style={{
               display: 'flex',
-              flexWrap: 'wrap',
+              flexDirection: 'column',
+              height: '100%',
               gap: '8px',
-              alignItems: 'center',
-              justifyContent: 'flex-start'
+              overflow: 'hidden'
             }}>
-              {/* Kill Switch Button */}
-              <button
-                onClick={handleKillSwitch}
-                disabled={!isUnlocked || isShutdown}
-                style={{
-                  background: isShutdown ? 'rgba(255,0,85,0.05)' : (!isUnlocked ? '#1e293b' : 'rgba(255,0,85,0.15)'),
-                  border: isShutdown ? '1px solid rgba(255,0,85,0.2)' : (!isUnlocked ? '1px solid #334155' : '1px solid #ff0055'),
-                  color: isShutdown ? 'rgba(255,0,85,0.4)' : (!isUnlocked ? '#64748b' : '#ff0055'),
-                  fontFamily: 'Orbitron',
-                  fontSize: '10px',
-                  padding: '7px 14px',
-                  borderRadius: '5px',
-                  cursor: (!isUnlocked || isShutdown) ? 'not-allowed' : 'pointer',
-                  letterSpacing: '1px',
-                  opacity: (!isUnlocked || isShutdown) ? 0.45 : 1,
-                  fontWeight: '700'
-                }}
-              >
-                {isShutdown ? 'DEAD' : 'KILL SWITCH'}
-              </button>
+              {/* Audit Ledger */}
+              <div className={`glass-panel ${focusSection === 'alerts' ? 'focus-highlight-red' : ''}`} style={{
+                flex: '1',
+                maxHeight: '33%',
+                overflowY: 'auto',
+                padding: '12px',
+                minHeight: 0,
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <KineticAlerts anomalies={anomalies} />
+              </div>
 
-              {/* Slide Button */}
-              {!isShutdown && (
-                <button
-                  onClick={() => setIsUnlocked(!isUnlocked)}
-                  style={{
-                    background: 'rgba(0,230,255,0.08)',
-                    border: '1px solid rgba(0,230,255,0.3)',
-                    color: '#00e5ff',
+              {/* Passport Registry */}
+              <div className={`glass-panel ${focusSection === 'tokens' ? 'focus-highlight-cyan' : ''}`} style={{
+                flex: '1',
+                maxHeight: '33%',
+                overflowY: 'auto',
+                padding: '12px',
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                boxSizing: 'border-box'
+              }}>
+                <div className="border-b border-white/5 pb-2 mb-2">
+                  <h3 className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+                    Active Passport Registry State
+                  </h3>
+                </div>
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                  {registryEntries.length === 0 ? (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '8px',
+                      padding: '12px'
+                    }}>
+                      {[
+                        { label: 'POLICY VERSION', value: 'v1.0', color: '#00e5ff' },
+                        { label: 'SANDBOX', value: 'ISOLATED', color: '#00f5a0' },
+                        { label: 'AUDIT CHAIN', value: 'SHA-256', color: '#00e5ff' },
+                        { label: 'TTL DAEMON', value: 'ACTIVE', color: '#00f5a0' },
+                        { label: 'RATE LIMIT', value: '10/min', color: '#ffaa00' },
+                        { label: 'SYSTEM ENV', value: 'SECURE ADK', color: '#00e5ff' },
+                      ].map((item, i) => (
+                        <div key={i} style={{
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                          borderRadius: '6px',
+                          padding: '10px 12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '4px'
+                        }}>
+                          <span style={{
+                            fontFamily: 'JetBrains Mono',
+                            fontSize: '9px',
+                            color: 'rgba(255,255,255,0.3)',
+                            letterSpacing: '1px'
+                          }}>{item.label}</span>
+                          <span style={{
+                            fontFamily: 'Orbitron',
+                            fontSize: '12px',
+                            color: item.color,
+                            fontWeight: '700'
+                          }}>{item.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <table style={{
+                      width: '100%',
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: '11px',
+                      borderCollapse: 'collapse'
+                    }}>
+                      <thead>
+                        <tr style={{color: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(255,255,255,0.08)'}}>
+                          <th style={{padding: '8px', textAlign:'left'}}>TOKEN REF</th>
+                          <th style={{padding: '8px', textAlign:'left'}}>AGENT ID</th>
+                          <th style={{padding: '8px', textAlign:'left'}}>TOOL TARGET</th>
+                          <th style={{padding: '8px', textAlign:'left'}}>TTL</th>
+                          <th style={{padding: '8px', textAlign:'left'}}>STATUS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {registryEntries.map((entry, i) => (
+                          <tr key={i} style={{
+                            borderBottom: '1px solid rgba(255,255,255,0.04)',
+                            color: entry.status === 'AUTHORIZED'
+                              ? '#00f5a0'
+                              : '#ffaa00'
+                          }}>
+                            <td style={{padding: '8px'}}>{entry.tokenRef}</td>
+                            <td style={{padding: '8px'}}>{entry.agentId}</td>
+                            <td style={{padding: '8px'}}>{entry.toolTarget}</td>
+                            <td style={{padding: '8px'}}>
+                              {entry.expiresAt ? (
+                                <EphemeralTimer expiresAt={entry.expiresAt} />
+                              ) : (
+                                entry.ttl
+                              )}
+                            </td>
+                            <td style={{padding: '8px'}}>{entry.status}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </div>
+
+              {/* Section 3 - Control Buttons Panel */}
+              <div className={`glass-panel ${focusSection === 'kill' ? 'focus-highlight-amber' : ''}`} style={{
+                flex: '1',
+                maxHeight: '33%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                padding: '14px 16px',
+                border: '1px solid rgba(0,230,255,0.3)',
+                borderRadius: '10px',
+                background: 'rgba(255,0,85,0.04)',
+                minHeight: 0,
+                boxSizing: 'border-box'
+              }}>
+                {/* Header */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  borderBottom: '1px solid rgba(19, 118, 131, 0.15)',
+                  paddingBottom: '8px',
+                  marginBottom: '10px'
+                }}>
+                  <span style={{
                     fontFamily: 'Orbitron',
-                    fontSize: '10px',
-                    padding: '7px 14px',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    letterSpacing: '1px',
+                    fontSize: '11px',
+                    color: '#cec2c6',
+                    letterSpacing: '2px',
                     fontWeight: '700'
-                  }}
-                >
-                  SLIDE
-                </button>
+                  }}>
+                    ⚡ MASTER REVOCATION TERMINAL
+                  </span>
+                  
+                  {isShutdown ? (
+                    <span style={{
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: '10px',
+                      padding: '3px 10px',
+                      border: '1px solid rgba(255,0,85,0.3)',
+                      borderRadius: '4px',
+                      color: '#ff0055',
+                      letterSpacing: '1px'
+                    }}>
+                      🚨 SHIELD DEAD
+                    </span>
+                  ) : isUnlocked ? (
+                    <span style={{
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: '10px',
+                      padding: '3px 10px',
+                      border: '1px solid rgba(255,170,0,0.3)',
+                      borderRadius: '4px',
+                      color: '#ffaa00',
+                      letterSpacing: '1px'
+                    }}>
+                      ⚠ SYSTEM ARMED
+                    </span>
+                  ) : (
+                    <span style={{
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: '10px',
+                      padding: '3px 10px',
+                      border: '1px solid rgba(0,245,160,0.3)',
+                      borderRadius: '4px',
+                      color: '#00f5a0',
+                      letterSpacing: '1px'
+                    }}>
+                      🛡 SHIELD ENGAGED
+                    </span>
+                  )}
+                </div>
+
+                {/* Buttons row */}
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start'
+                }}>
+                  {/* Kill Switch Button */}
+                  <button
+                    onClick={handleKillSwitch}
+                    disabled={!isUnlocked || isShutdown}
+                    style={{
+                      background: isShutdown ? 'rgba(255,0,85,0.05)' : (!isUnlocked ? '#1e293b' : 'rgba(255,0,85,0.15)'),
+                      border: isShutdown ? '1px solid rgba(255,0,85,0.2)' : (!isUnlocked ? '1px solid #334155' : '1px solid #ff0055'),
+                      color: isShutdown ? 'rgba(255,0,85,0.4)' : (!isUnlocked ? '#64748b' : '#ff0055'),
+                      fontFamily: 'Orbitron',
+                      fontSize: '10px',
+                      padding: '7px 14px',
+                      borderRadius: '5px',
+                      cursor: (!isUnlocked || isShutdown) ? 'not-allowed' : 'pointer',
+                      letterSpacing: '1px',
+                      opacity: (!isUnlocked || isShutdown) ? 0.45 : 1,
+                      fontWeight: '700'
+                    }}
+                  >
+                    {isShutdown ? 'DEAD' : 'KILL SWITCH'}
+                  </button>
+
+                  {/* Slide Button */}
+                  {!isShutdown && (
+                    <button
+                      onClick={() => setIsUnlocked(!isUnlocked)}
+                      style={{
+                        background: 'rgba(0,230,255,0.08)',
+                        border: '1px solid rgba(0,230,255,0.3)',
+                        color: '#00e5ff',
+                        fontFamily: 'Orbitron',
+                        fontSize: '10px',
+                        padding: '7px 14px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        letterSpacing: '1px',
+                        fontWeight: '700'
+                      }}
+                    >
+                      SLIDE
+                    </button>
+                  )}
+
+                  {/* Release Shield Button */}
+                  {!isShutdown && (
+                    <button
+                      onClick={() => setIsUnlocked(!isUnlocked)}
+                      style={{
+                        background: 'rgba(255,170,0,0.08)',
+                        border: '1px solid rgba(255,170,0,0.3)',
+                        color: '#ffaa00',
+                        fontFamily: 'Orbitron',
+                        fontSize: '10px',
+                        padding: '7px 14px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        letterSpacing: '1px',
+                        fontWeight: '700'
+                      }}
+                    >
+                      RELEASE SHIELD
+                    </button>
+                  )}
+
+                  {/* Re-arm & Reset Button (renders if dead) */}
+                  {isShutdown && (
+                    <button
+                      onClick={handleReset}
+                      style={{
+                        background: 'rgba(0,245,160,0.08)',
+                        border: '1px solid rgba(0,245,160,0.3)',
+                        color: '#00f5a0',
+                        fontFamily: 'Orbitron',
+                        fontSize: '10px',
+                        padding: '7px 14px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        letterSpacing: '1px',
+                        fontWeight: '700'
+                      }}
+                    >
+                      RE-ARM & RESET
+                    </button>
+                  )}
+
+                  {/* Secure Call Bypass */}
+                  <button
+                    onClick={() => runSimulator('authorized')}
+                    disabled={simulating !== null || isShutdown || cooldown > 0}
+                    style={{
+                      background: 'rgba(0,245,160,0.08)',
+                      border: '1px solid rgba(0,245,160,0.3)',
+                      color: '#00f5a0',
+                      fontFamily: 'Orbitron',
+                      fontSize: '10px',
+                      padding: '7px 14px',
+                      borderRadius: '5px',
+                      cursor: (simulating !== null || isShutdown || cooldown > 0) ? 'not-allowed' : 'pointer',
+                      letterSpacing: '1px',
+                      opacity: (simulating !== null || isShutdown || cooldown > 0) ? 0.45 : 1,
+                      fontWeight: '700'
+                    }}
+                  >
+                    SECURE CALL BYPASS
+                  </button>
+
+                  {/* Attempt */}
+                  <button
+                    onClick={() => runSimulator('bypass')}
+                    disabled={simulating !== null || isShutdown || cooldown > 0}
+                    style={{
+                      background: 'rgba(255,0,85,0.08)',
+                      border: '1px solid rgba(255,0,85,0.3)',
+                      color: '#ff0055',
+                      fontFamily: 'Orbitron',
+                      fontSize: '10px',
+                      padding: '7px 14px',
+                      borderRadius: '5px',
+                      cursor: (simulating !== null || isShutdown || cooldown > 0) ? 'not-allowed' : 'pointer',
+                      letterSpacing: '1px',
+                      opacity: (simulating !== null || isShutdown || cooldown > 0) ? 0.45 : 1,
+                      fontWeight: '700'
+                    }}
+                  >
+                    ATTEMPT
+                  </button>
+
+                  {/* Inject Anomaly */}
+                  <button
+                    onClick={() => runSimulator('anomaly')}
+                    disabled={simulating !== null || isShutdown || cooldown > 0}
+                    style={{
+                      background: 'rgba(121,40,202,0.15)',
+                      border: '1px solid rgba(121,40,202,0.4)',
+                      color: '#a855f7',
+                      fontFamily: 'Orbitron',
+                      fontSize: '10px',
+                      padding: '7px 14px',
+                      borderRadius: '5px',
+                      cursor: (simulating !== null || isShutdown || cooldown > 0) ? 'not-allowed' : 'pointer',
+                      letterSpacing: '1px',
+                      opacity: (simulating !== null || isShutdown || cooldown > 0) ? 0.45 : 1,
+                      fontWeight: '700'
+                    }}
+                  >
+                    INJECT ANOMALY
+                  </button>
+                </div>
+              </div>
+            </section>
+          </main>
+
+          {/* Log Console Display */}
+          <div style={{
+            position: 'fixed',
+            bottom: '12px',
+            left: '12px',
+            width: '320px',
+            fontSize: '12.5px',
+            lineHeight: 1.9,
+            color: 'rgba(0, 230, 255, 0.85)',
+            background: 'rgba(0, 0, 0, 0.7)',
+            border: '1px solid rgba(0, 230, 255, 0.2)',
+            padding: '14px 16px',
+            borderRadius: '8px',
+            maxHeight: '130px',
+            overflowY: 'auto',
+            zIndex: 40,
+            boxSizing: 'border-box',
+            fontFamily: "'JetBrains Mono', monospace"
+          }}>
+            <div style={{
+              borderBottom: '1px solid rgba(0, 230, 255, 0.2)',
+              paddingBottom: '6px',
+              marginBottom: '8px',
+              fontFamily: "'Orbitron', sans-serif",
+              fontSize: '9px',
+              textTransform: 'uppercase',
+              color: 'rgba(0, 230, 255, 0.6)'
+            }}>
+              SIMULATION CONSOLE LOGS {cooldown > 0 && <span style={{ color: '#ffaa00', marginLeft: '6px' }}>COOLDOWN {cooldown}s</span>}
+            </div>
+            <div>
+              {logConsole.length === 0 ? (
+                <div style={{ color: 'rgba(0, 230, 255, 0.4)', fontStyle: 'italic' }}>NO LOG ENTRIES</div>
+              ) : (
+                logConsole.map((log, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '4px' }}>
+                    <span>[{log.time}] {log.rawText}</span>
+                    {log.count > 1 && (
+                      <span style={{ color: '#00e5ff', fontWeight: 'bold', backgroundColor: 'rgba(0,229,255,0.1)', padding: '0 4px', borderRadius: '2px' }}>
+                        x{log.count}
+                      </span>
+                    )}
+                  </div>
+                ))
               )}
-
-              {/* Release Shield Button */}
-              {!isShutdown && (
-                <button
-                  onClick={() => setIsUnlocked(!isUnlocked)}
-                  style={{
-                    background: 'rgba(255,170,0,0.08)',
-                    border: '1px solid rgba(255,170,0,0.3)',
-                    color: '#ffaa00',
-                    fontFamily: 'Orbitron',
-                    fontSize: '10px',
-                    padding: '7px 14px',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    letterSpacing: '1px',
-                    fontWeight: '700'
-                  }}
-                >
-                  RELEASE SHIELD
-                </button>
-              )}
-
-              {/* Re-arm & Reset Button (renders if dead) */}
-              {isShutdown && (
-                <button
-                  onClick={handleReset}
-                  style={{
-                    background: 'rgba(0,245,160,0.08)',
-                    border: '1px solid rgba(0,245,160,0.3)',
-                    color: '#00f5a0',
-                    fontFamily: 'Orbitron',
-                    fontSize: '10px',
-                    padding: '7px 14px',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    letterSpacing: '1px',
-                    fontWeight: '700'
-                  }}
-                >
-                  RE-ARM & RESET
-                </button>
-              )}
-
-              {/* Secure Call Bypass */}
-              <button
-                onClick={() => runSimulator('authorized')}
-                disabled={simulating !== null || isShutdown || cooldown > 0}
-                style={{
-                  background: 'rgba(0,245,160,0.08)',
-                  border: '1px solid rgba(0,245,160,0.3)',
-                  color: '#00f5a0',
-                  fontFamily: 'Orbitron',
-                  fontSize: '10px',
-                  padding: '7px 14px',
-                  borderRadius: '5px',
-                  cursor: (simulating !== null || isShutdown || cooldown > 0) ? 'not-allowed' : 'pointer',
-                  letterSpacing: '1px',
-                  opacity: (simulating !== null || isShutdown || cooldown > 0) ? 0.45 : 1,
-                  fontWeight: '700'
-                }}
-              >
-                SECURE CALL BYPASS
-              </button>
-
-              {/* Attempt */}
-              <button
-                onClick={() => runSimulator('bypass')}
-                disabled={simulating !== null || isShutdown || cooldown > 0}
-                style={{
-                  background: 'rgba(255,0,85,0.08)',
-                  border: '1px solid rgba(255,0,85,0.3)',
-                  color: '#ff0055',
-                  fontFamily: 'Orbitron',
-                  fontSize: '10px',
-                  padding: '7px 14px',
-                  borderRadius: '5px',
-                  cursor: (simulating !== null || isShutdown || cooldown > 0) ? 'not-allowed' : 'pointer',
-                  letterSpacing: '1px',
-                  opacity: (simulating !== null || isShutdown || cooldown > 0) ? 0.45 : 1,
-                  fontWeight: '700'
-                }}
-              >
-                ATTEMPT
-              </button>
-
-              {/* Inject Anomaly */}
-              <button
-                onClick={() => runSimulator('anomaly')}
-                disabled={simulating !== null || isShutdown || cooldown > 0}
-                style={{
-                  background: 'rgba(121,40,202,0.15)',
-                  border: '1px solid rgba(121,40,202,0.4)',
-                  color: '#a855f7',
-                  fontFamily: 'Orbitron',
-                  fontSize: '10px',
-                  padding: '7px 14px',
-                  borderRadius: '5px',
-                  cursor: (simulating !== null || isShutdown || cooldown > 0) ? 'not-allowed' : 'pointer',
-                  letterSpacing: '1px',
-                  opacity: (simulating !== null || isShutdown || cooldown > 0) ? 0.45 : 1,
-                  fontWeight: '700'
-                }}
-              >
-                INJECT ANOMALY
-              </button>
             </div>
           </div>
-        </section>
-      </main>
 
-      {/* Log Console Display */}
-      <div style={{
-        position: 'fixed',
-        bottom: '12px',
-        left: '12px',
-        width: '320px',
-        fontSize: '12.5px',
-        lineHeight: 1.9,
-        color: 'rgba(0, 230, 255, 0.85)',
-        background: 'rgba(0, 0, 0, 0.7)',
-        border: '1px solid rgba(0, 230, 255, 0.2)',
-        padding: '14px 16px',
-        borderRadius: '8px',
-        maxHeight: '130px',
-        overflowY: 'auto',
-        zIndex: 40,
-        boxSizing: 'border-box',
-        fontFamily: "'JetBrains Mono', monospace"
-      }}>
-        <div style={{
-          borderBottom: '1px solid rgba(0, 230, 255, 0.2)',
-          paddingBottom: '6px',
-          marginBottom: '8px',
-          fontFamily: "'Orbitron', sans-serif",
-          fontSize: '9px',
-          textTransform: 'uppercase',
-          color: 'rgba(0, 230, 255, 0.6)'
-        }}>
-          SIMULATION CONSOLE LOGS {cooldown > 0 && <span style={{ color: '#ffaa00', marginLeft: '6px' }}>COOLDOWN {cooldown}s</span>}
-        </div>
-        <div>
-          {logConsole.length === 0 ? (
-            <div style={{ color: 'rgba(0, 230, 255, 0.4)', fontStyle: 'italic' }}>NO LOG ENTRIES</div>
-          ) : (
-            logConsole.map((log, idx) => (
-              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '4px' }}>
-                <span>[{log.time}] {log.rawText}</span>
-                {log.count > 1 && (
-                  <span style={{ color: '#00e5ff', fontWeight: 'bold', backgroundColor: 'rgba(0,229,255,0.1)', padding: '0 4px', borderRadius: '2px' }}>
-                    x{log.count}
-                  </span>
+          {/* Sliding Node Detail Panel Overlay */}
+          <div 
+            className={`fixed top-0 right-0 h-full w-80 bg-[#090d16]/95 border-l border-white/10 p-5 shadow-2xl transition-transform duration-300 z-50 flex flex-col gap-4 text-[10px] ${
+              selectedNodeId ? 'translate-x-0' : 'translate-x-full'
+            }`}
+            style={{ fontFamily: "'JetBrains Mono', monospace" }}
+          >
+            <div className="flex justify-between items-center border-b border-white/5 pb-2">
+              <h2 className="text-xs font-bold text-slate-200 uppercase tracking-wider" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+                Node Diagnostics
+              </h2>
+              <button 
+                onClick={() => setSelectedNodeId(null)}
+                className="text-slate-500 hover:text-slate-200 text-sm select-none"
+                style={{ border: 'none', background: 'none', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {selectedNodeId && (
+              <div className="flex-1 flex flex-col gap-3">
+                <div>
+                  <span className="text-slate-500 text-[8px] uppercase">Node Identifier</span>
+                  <p className="text-cyan-400 font-bold text-xs mt-0.5">{selectedNodeId.toUpperCase()}</p>
+                </div>
+                
+                <div className="w-full h-[1px] bg-white/5"></div>
+
+                {selectedNodeId === 'requestor' ? (
+                  <>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase font-bold">Node Type</span>
+                      <p className="text-slate-300 mt-0.5">User-Facing Agent Client</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Standing Privilege</span>
+                      <p className="text-rose-400 font-semibold mt-0.5">ZERO (ZSP Enforced)</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Simulation Identity</span>
+                      <p className="text-slate-300 mt-0.5">requestor-agent-01</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Current State</span>
+                      <p className={isShutdown ? 'text-rose-400 font-bold' : 'text-[#00f5a0]'}>
+                        {isShutdown ? 'LOCKED / REJECTING ALL REQUESTS' : 'ACTIVE / REQUESTING MOCK TOOLS'}
+                      </p>
+                    </div>
+                  </>
+                ) : selectedNodeId === 'hook' ? (
+                  <>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Hook Target</span>
+                      <p className="text-slate-300 mt-0.5">Process runtime SDK (ToolRunner)</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Enforcement state</span>
+                      <p className="text-[#00f5a0] font-semibold mt-0.5">ACTIVE & CONTAINED</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Bypass Blocks Logged</span>
+                      <p className="text-rose-400 font-bold mt-0.5">
+                        {anomalies.filter(a => a.type === 'GATEWAY_BYPASS_ATTEMPT').length} Attacks Blocked
+                      </p>
+                    </div>
+                  </>
+                ) : selectedNodeId === 'gateway' ? (
+                  <>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Gateway URL</span>
+                      <p className="text-slate-300 mt-0.5">{httpUrl}</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Sandbox boundary checks</span>
+                      <p className="text-slate-300 mt-0.5">normalize() / lowerCase() path containment</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Audit Ledger Integrity</span>
+                      <p className="text-cyan-400 mt-0.5 font-bold">CRYPTOGRAPHICALLY CHAINED (SHA-256)</p>
+                    </div>
+                  </>
+                ) : selectedNodeId === 'governance' ? (
+                  <>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Policy Authority</span>
+                      <p className="text-slate-300 mt-0.5">GovernanceAgent policy engine</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Policy Version</span>
+                      <p className="text-purple-400 font-bold mt-0.5">v1 (Rollback support enabled)</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Sandbox boundary checks</span>
+                      <p className="text-slate-300 mt-0.5">normalize() / lowerCase() path containment</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Tool Name</span>
+                      <p className="text-slate-300 mt-0.5">MCP System Tool ({selectedNodeId})</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Privilege Level</span>
+                      <p className="text-amber-400 font-semibold mt-0.5">Ephemeral checkout scope only</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-[8px] uppercase">Isolation Layer</span>
+                      <p className="text-slate-300 mt-0.5">Virtual Node Container Dry-run</p>
+                    </div>
+                  </>
                 )}
               </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Sliding Node Detail Panel Overlay */}
-      <div 
-        className={`fixed top-0 right-0 h-full w-80 bg-[#090d16]/95 border-l border-white/10 p-5 shadow-2xl transition-transform duration-300 z-50 flex flex-col gap-4 text-[10px] ${
-          selectedNodeId ? 'translate-x-0' : 'translate-x-full'
-        }`}
-        style={{ fontFamily: "'JetBrains Mono', monospace" }}
-      >
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
-          <h2 className="text-xs font-bold text-slate-200 uppercase tracking-wider" style={{ fontFamily: "'Orbitron', sans-serif" }}>
-            Node Diagnostics
-          </h2>
-          <button 
-            onClick={() => setSelectedNodeId(null)}
-            className="text-slate-500 hover:text-slate-200 text-sm select-none"
-            style={{ border: 'none', background: 'none', cursor: 'pointer' }}
-          >
-            ✕
-          </button>
-        </div>
-
-        {selectedNodeId && (
-          <div className="flex-1 flex flex-col gap-3">
-            <div>
-              <span className="text-slate-500 text-[8px] uppercase">Node Identifier</span>
-              <p className="text-cyan-400 font-bold text-xs mt-0.5">{selectedNodeId.toUpperCase()}</p>
-            </div>
-            
-            <div className="w-full h-[1px] bg-white/5"></div>
-
-            {selectedNodeId === 'requestor' ? (
-              <>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase font-bold">Node Type</span>
-                  <p className="text-slate-300 mt-0.5">User-Facing Agent Client</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Standing Privilege</span>
-                  <p className="text-rose-400 font-semibold mt-0.5">ZERO (ZSP Enforced)</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Simulation Identity</span>
-                  <p className="text-slate-300 mt-0.5">requestor-agent-01</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Current State</span>
-                  <p className={isShutdown ? 'text-rose-400 font-bold' : 'text-[#00f5a0]'}>
-                    {isShutdown ? 'LOCKED / REJECTING ALL REQUESTS' : 'ACTIVE / REQUESTING MOCK TOOLS'}
-                  </p>
-                </div>
-              </>
-            ) : selectedNodeId === 'hook' ? (
-              <>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Hook Target</span>
-                  <p className="text-slate-300 mt-0.5">Process runtime SDK (ToolRunner)</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Enforcement state</span>
-                  <p className="text-[#00f5a0] font-semibold mt-0.5">ACTIVE & CONTAINED</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Bypass Blocks Logged</span>
-                  <p className="text-rose-400 font-bold mt-0.5">
-                    {anomalies.filter(a => a.type === 'GATEWAY_BYPASS_ATTEMPT').length} Attacks Blocked
-                  </p>
-                </div>
-              </>
-            ) : selectedNodeId === 'gateway' ? (
-              <>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Gateway URL</span>
-                  <p className="text-slate-300 mt-0.5">{httpUrl}</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Sandbox boundary checks</span>
-                  <p className="text-slate-300 mt-0.5">normalize() / lowerCase() path containment</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Audit Ledger Integrity</span>
-                  <p className="text-cyan-400 mt-0.5 font-bold">CRYPTOGRAPHICALLY CHAINED (SHA-256)</p>
-                </div>
-              </>
-            ) : selectedNodeId === 'governance' ? (
-              <>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Policy Authority</span>
-                  <p className="text-slate-300 mt-0.5">GovernanceAgent policy engine</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Policy Version</span>
-                  <p className="text-purple-400 font-bold mt-0.5">v1 (Rollback support enabled)</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Sandbox boundary checks</span>
-                  <p className="text-slate-300 mt-0.5">normalize() / lowerCase() path containment</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Tool Name</span>
-                  <p className="text-slate-300 mt-0.5">MCP System Tool ({selectedNodeId})</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Privilege Level</span>
-                  <p className="text-amber-400 font-semibold mt-0.5">Ephemeral checkout scope only</p>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[8px] uppercase">Isolation Layer</span>
-                  <p className="text-slate-300 mt-0.5">Virtual Node Container Dry-run</p>
-                </div>
-              </>
             )}
           </div>
-        )}
-      </div>
-    </div>
+        </>
+      )} </div>
   );
 }
 export default App;

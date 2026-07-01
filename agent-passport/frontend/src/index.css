@@ -139,3 +139,147 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
 }
 
+/* Custom CSS Focus Highlights and Animations */
+@keyframes focusPulseCyan {
+  0% { box-shadow: 0 0 4px rgba(0, 229, 255, 0.15); border-color: rgba(0, 229, 255, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(0, 229, 255, 0.7); border-color: rgba(0, 229, 255, 0.75); }
+  100% { box-shadow: 0 0 4px rgba(0, 229, 255, 0.15); border-color: rgba(0, 229, 255, 0.15); }
+}
+.focus-highlight-cyan {
+  animation: focusPulseCyan 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes focusPulseGreen {
+  0% { box-shadow: 0 0 4px rgba(0, 245, 160, 0.15); border-color: rgba(0, 245, 160, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(0, 245, 160, 0.7); border-color: rgba(0, 245, 160, 0.75); }
+  100% { box-shadow: 0 0 4px rgba(0, 245, 160, 0.15); border-color: rgba(0, 245, 160, 0.15); }
+}
+.focus-highlight-green {
+  animation: focusPulseGreen 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes focusPulseRed {
+  0% { box-shadow: 0 0 4px rgba(255, 59, 105, 0.15); border-color: rgba(255, 59, 105, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(255, 59, 105, 0.7); border-color: rgba(255, 59, 105, 0.75); }
+  100% { box-shadow: 0 0 4px rgba(255, 59, 105, 0.15); border-color: rgba(255, 59, 105, 0.15); }
+}
+.focus-highlight-red {
+  animation: focusPulseRed 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes focusPulseAmber {
+  0% { box-shadow: 0 0 4px rgba(255, 184, 0, 0.15); border-color: rgba(255, 184, 0, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(255, 184, 0, 0.7); border-color: rgba(255, 184, 0, 0.75); }
+  100% { box-shadow: 0 0 4px rgba(255, 184, 0, 0.15); border-color: rgba(255, 184, 0, 0.15); }
+}
+.focus-highlight-amber {
+  animation: focusPulseAmber 1.5s ease-in-out infinite alternate;
+}
+
+/* Decorative corner brackets for HUD feel */
+.corner-bracket {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: rgba(0, 229, 255, 0.25);
+  border-style: solid;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+.corner-bracket-tl {
+  top: 24px;
+  left: 24px;
+  border-width: 2px 0 0 2px;
+}
+.corner-bracket-tr {
+  top: 24px;
+  right: 24px;
+  border-width: 2px 2px 0 0;
+}
+.corner-bracket-bl {
+  bottom: 24px;
+  left: 24px;
+  border-width: 0 0 2px 2px;
+}
+.corner-bracket-br {
+  bottom: 24px;
+  right: 24px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Pulsing Status Dot */
+@keyframes pulseDot {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 10px rgba(0, 245, 160, 0.8); }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+.pulsing-dot-green {
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+/* Landing Page Buttons */
+.btn-landing {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 10px 24px;
+  border-radius: 6px;
+  background: rgba(9, 13, 22, 0.55);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.btn-landing-cyan {
+  color: #00e5ff;
+  border-color: rgba(0, 229, 255, 0.25);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.05);
+}
+.btn-landing-cyan:hover {
+  border-color: #00e5ff;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+  background: rgba(0, 229, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.btn-landing-green {
+  color: #00f5a0;
+  border-color: rgba(0, 245, 160, 0.25);
+  box-shadow: 0 0 10px rgba(0, 245, 160, 0.05);
+}
+.btn-landing-green:hover {
+  border-color: #00f5a0;
+  box-shadow: 0 0 20px rgba(0, 245, 160, 0.35);
+  background: rgba(0, 245, 160, 0.08);
+  transform: translateY(-2px);
+}
+
+.btn-landing-red {
+  color: #ff3b69;
+  border-color: rgba(255, 59, 105, 0.25);
+  box-shadow: 0 0 10px rgba(255, 59, 105, 0.05);
+}
+.btn-landing-red:hover {
+  border-color: #ff3b69;
+  box-shadow: 0 0 20px rgba(255, 59, 105, 0.35);
+  background: rgba(255, 59, 105, 0.08);
+  transform: translateY(-2px);
+}
+
+.btn-landing-amber {
+  color: #ffaa00;
+  border-color: rgba(255, 170, 0, 0.25);
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.05);
+}
+.btn-landing-amber:hover {
+  border-color: #ffaa00;
+  box-shadow: 0 0 20px rgba(255, 170, 0, 0.35);
+  background: rgba(255, 170, 0, 0.08);
+  transform: translateY(-2px);
+}
