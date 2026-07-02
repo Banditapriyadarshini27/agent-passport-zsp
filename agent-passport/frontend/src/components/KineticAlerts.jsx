@@ -23,16 +23,7 @@ export function KineticAlerts({ anomalies }) {
   };
 
   const getSortedAnomalies = () => {
-    // Filter out blocked log types
-    const filtered = anomalies.filter(log => 
-      !BLOCKED_LOG_TYPES.some(type => 
-        (log.type && String(log.type).includes(type)) || 
-        (log.action && String(log.action).includes(type)) ||
-        (log.message && String(log.message).includes(type))
-      )
-    );
-    
-    const sorted = [...filtered];
+    const sorted = [...anomalies];
     
     sorted.sort((a, b) => {
       let valA = a[sortField];

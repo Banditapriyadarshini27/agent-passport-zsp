@@ -32,13 +32,14 @@ const EphemeralTimer = ({ expiresAt }) => {
 };
 
 // Dynamic backend address resolver (supports local fallback and dynamic tunnels/hosting)
-const wsUrl = window.location.hostname === 'localhost'
+const wsUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'ws://127.0.0.1:4000'
   : `wss://${window.location.hostname}`;
 
-const httpUrl = window.location.hostname === 'localhost'
+const httpUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://127.0.0.1:4000'
   : `https://${window.location.hostname}`;
+
 
 const BLOCKED_LOG_TYPES = [
   'SHELL_INJECTION',
