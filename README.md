@@ -8,9 +8,13 @@ pinned: false
 
 # Agent-Passport
 
+> Zero standing access for AI agents. Every tool call is checked out, used once, and expires.
+
 A Zero-Standing-Privilege (ZSP) governance and identity middleware for multi-agent systems. Built for the **AI Agents Intensive Vibe Coding Course ('Agents for Business' track)**.
 
-Agent-Passport intercept and controls agent-to-tool operations using process-level lockdown hooks, ephemeral time-bound credential registries, and a live web-based security command center.
+Agent-Passport intercepts and controls agent-to-tool operations using process-level lockdown hooks, ephemeral time-bound credential registries, and a live web-based security command center.
+
+Instead of giving AI agents standing, long-lived access to tools and files, Agent-Passport requires every action to be checked out as a short-lived, single-use token — used once, then gone.
 
 ---
 
@@ -71,6 +75,8 @@ agent-passport/
 │   │   └── hook.js
 │   ├── registry/             # In-memory ephemeral registry
 │   │   └── passport.js
+│   ├── policies/             # Declarative governance rules (see Roadmap)
+│   │   └── policies.yaml
 │   ├── package.json
 │   └── Dockerfile
 ├── docker-compose.yml        # Multi-container orchestrator
@@ -133,3 +139,20 @@ Where `[scenario]` is one of:
 3. **Inject Anomaly**: The agent sends command injections (`rm -rf`). The Anomaly engine identifies the destructive pattern and drops the request.
 4. **Bad Path**: The agent requests files in system folders (`C:/Windows/...`). Governance checks policies and rejects the checkout.
 5. **Kill Switch**: Triggering the mechanical switch flushes all active keys. The network locks down and all requests fail until system reset.
+
+---
+
+## Known Limitations & Roadmap
+
+This is a V1 built for a 5-day capstone — a few things are intentionally simplified for now:
+
+- **Simulation-based, not live-agent-tested.** Currently demoed via scripted CLI scenarios (`requestor.js`). Next step: wire up a real LLM agent or expose the gateway as an actual MCP server so real MCP clients (Claude Desktop, Cursor, etc.) can connect.
+- **In-memory registry.** Tokens currently live in a single Node process. Planned: move to Redis (native TTL support via `SETEX`) to support multiple gateway instances and horizontal scaling.
+- **Hardcoded governance rules.** Policy logic currently lives in `governance.js`. Planned: move to a declarative `policies.yaml`/`policies.json` file so rules can be defined and extended without touching code.
+- **Pattern-matching anomaly detection.** Dangerous payloads are currently caught via string matching (`rm -rf`, path traversal). This is a reasonable V1 but not a hardened threat model. Planned: sandboxed tool execution and allowlist-based validation instead of denylist pattern matching.
+
+---
+
+## About
+
+Zero-Standing-Privilege security layer for AI agents — every tool call is a short-lived, single-use checked-out token instead of standing access. Built for the AI Agents Intensive (Agents for Business track).
