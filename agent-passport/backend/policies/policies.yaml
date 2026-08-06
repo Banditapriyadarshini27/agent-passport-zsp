@@ -1,0 +1,85 @@
+# ==============================================================================
+# DECLARATIVE GOVERNANCE POLICIES (policies.yaml)
+# ==============================================================================
+# WHAT THIS FILE DOES:
+# This YAML configuration file declaratively defines security rules and access
+# control policies for different AI agents in the Agent-Passport system.
+#
+# WHY IT'S STRUCTURED THIS WAY:
+# Separating governance rules into a declarative policy file removes hardcoded
+# if/else logic from backend JavaScript code. Security rules can now be updated,
+# audited, and managed independently without re-deploying application code.
+#
+# NODE.JS / YAML CONCEPTS FOR BEGINNERS:
+# 1. YAML (YAML Ain't Markup Language) is a human-readable data serialization
+#    format commonly used for configuration files.
+# 2. Lists/Arrays are denoted with a leading dash (-) for each element.
+# 3. Keys and values use colon space syntax (key: value).
+# 4. Declarative vs Imperative: Declarative configuration states WHAT rules exist
+#    (e.g. allowed_tools), whereas imperative code specifies HOW to check them.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# POLICY 1: Requestor Agent 01 (Used by the automated CLI simulation client)
+# ------------------------------------------------------------------------------
+- agent: requestor-agent-01
+  # List of MCP tool names this agent is authorized to execute
+  allowed_tools:
+    - read_file
+    - list_dir
+    - write_to_file
+    - search_web
+  # Path patterns that this agent is strictly forbidden from accessing
+  denied_paths:
+    - "/etc"
+    - "C:/Windows"
+    - "/System"
+    - "system32"
+  # Ephemeral Passport token lifespan in seconds before automatic expiration
+  max_ttl_seconds: 5
+  # Rate limiting threshold for request throttling
+  max_requests_per_minute: 20
+
+# ------------------------------------------------------------------------------
+# POLICY 2: Standard Requestor Agent (Default template policy for standard agents)
+# ------------------------------------------------------------------------------
+- agent: requestor-agent
+  allowed_tools:
+    - read_file
+    - list_dir
+  denied_paths:
+    - "/etc"
+    - "C:/Windows"
+    - "/System"
+  max_ttl_seconds: 5
+  max_requests_per_minute: 20
+
+# ------------------------------------------------------------------------------
+# POLICY 3: Admin Agent (Elevated administrative policy with broader access)
+# ------------------------------------------------------------------------------
+- agent: admin-agent
+  allowed_tools:
+    - read_file
+    - write_to_file
+    - list_dir
+    - search_web
+    - execute_command
+  denied_paths:
+    - "/etc/shadow"
+    - "C:/Windows/System32/config"
+  max_ttl_seconds: 30
+  max_requests_per_minute: 100
+
+# ------------------------------------------------------------------------------
+# POLICY 4: Restricted / Auditor Agent (Strict read-only policy example)
+# ------------------------------------------------------------------------------
+- agent: restricted-agent
+  allowed_tools:
+    - read_file
+  denied_paths:
+    - "/etc"
+    - "C:/Windows"
+    - "/System"
+    - "/var"
+  max_ttl_seconds: 3
+  max_requests_per_minute: 5

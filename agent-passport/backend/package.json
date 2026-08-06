@@ -7,9 +7,12 @@
     "start": "node mcp_server/server.js",
     "requestor": "node agents/requestor.js"
   },
+  "//_learning_note": "WHAT THIS FILE DOES: package.json manifests project metadata, scripts, and runtime dependencies for Node.js. WHY IT'S STRUCTURED THIS WAY: 'js-yaml' is included in dependencies so Node can parse YAML policy files. CONCEPT: Node ES modules use 'type': 'module' allowing top-level import statements.",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "js-yaml": "^4.1.0",
     "ws": "^8.16.0"
   }
 }
+

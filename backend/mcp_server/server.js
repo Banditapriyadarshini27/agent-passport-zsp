@@ -101,18 +101,14 @@ registry.onExpire((expiredGrant) => {
 
 // 6. Isolated Sandbox Execution Layer
 function runInSandbox(toolName, args) {
-  // Simulates executing the tool in an isolated sandbox.
-  // We scan the args for OS paths or syntax faults.
   console.log(`[Sandbox Execution] Isolating call for tool '${toolName}'...`);
   
   const argsStr = JSON.stringify(args || '').toLowerCase();
   
-  // Sandbox boundary check
   if (argsStr.includes('sandbox.bypass') || argsStr.includes('/var/run/docker.sock')) {
     throw new Error('Sandbox violation: Attempted to mount docker socket or bypass container boundary.');
   }
 
-  // Returns simulated dry-run outcome
   return {
     sandboxed: true,
     sandboxId: `sb_${crypto.randomBytes(8).toString('hex')}`,
@@ -138,7 +134,6 @@ function runAnomalyCheck(agentId, toolName, args) {
     }
   }
 
-  // 7. Rate Limiting Enforcer (Max 10 calls per agent per minute)
   const now = Date.now();
   if (!rateLimitMap.has(agentId)) {
     rateLimitMap.set(agentId, []);
@@ -148,7 +143,6 @@ function runAnomalyCheck(agentId, toolName, args) {
   rateLimitMap.set(agentId, timestamps);
 
   if (timestamps.length > 10) {
-    // Revoke all tokens for this agent due to flooding
     registry.flush();
     return {
       detected: true,
@@ -158,9 +152,6 @@ function runAnomalyCheck(agentId, toolName, args) {
     };
   }
 
-  // 8. Behavioral Anomaly Detection
-  // Baseline: user-facing agent standard behavior is read_file & list_dir
-  // Requesting search_web and write_to_file together in a 60s window flags a combination baseline breach.
   if (!behavioralMap.has(agentId)) {
     behavioralMap.set(agentId, new Set());
   }
@@ -168,7 +159,7 @@ function runAnomalyCheck(agentId, toolName, args) {
   toolSet.add(toolName);
   
   if (toolSet.has('write_to_file') && toolSet.has('search_web')) {
-    toolSet.clear(); // Reset baseline check
+    toolSet.clear();
     return {
       detected: true,
       type: 'BEHAVIORAL_ANOMALY',
@@ -182,7 +173,6 @@ function runAnomalyCheck(agentId, toolName, args) {
 
 // --- REST Endpoints ---
 
-// Root landing page
 app.get('/', (req, res) => {
   res.send(`
     <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; padding: 60px 20px; background: #05070a; color: #cfd6e4; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box;">
@@ -314,7 +304,6 @@ app.post('/mcp/execute', (req, res) => {
 
   const { agentId, toolName, token, args } = req.body;
 
-  // Validate Token
   const validation = registry.validate(token, agentId, toolName);
   if (!validation.valid) {
     const alert = {
@@ -335,7 +324,6 @@ app.post('/mcp/execute', (req, res) => {
     return res.status(401).json({ error: 'Access Denied', reason: validation.reason });
   }
 
-  // Run final execution anomaly check
   const anomaly = runAnomalyCheck(agentId, toolName, args);
   if (anomaly.detected) {
     const alert = {
@@ -355,7 +343,6 @@ app.post('/mcp/execute', (req, res) => {
     return res.status(400).json({ error: 'Security Violation', reason: anomaly.description });
   }
 
-  // Run call inside Sandbox isolation layer first
   let sandboxInfo;
   try {
     sandboxInfo = runInSandbox(toolName, args);
@@ -376,16 +363,13 @@ app.post('/mcp/execute', (req, res) => {
     return res.status(400).json({ error: 'Sandbox Violation', reason: err.message });
   }
 
-  // Record valid transaction
   const logEntry = { agentId, toolName, timestamp: Date.now(), status: 'SUCCESS', args, sandboxId: sandboxInfo.sandboxId };
   events.push(logEntry);
   addAuditLog('TOOL_EXECUTED', logEntry);
 
-  // Broadcast traffic pulse
   broadcast('request_pulse', { agentId, toolName, approved: true, status: 'SUCCESS' });
   broadcast('registry_update', registry.getActiveGrants());
 
-  // Mock execution output based on tool
   let result = `Executed tool '${toolName}' successfully.`;
   if (toolName === 'read_file') {
     result = `[READ FILE OUTPUT] Content of target file: "Welcome to the capstone project. Security is active."`;
@@ -400,7 +384,6 @@ app.post('/mcp/execute', (req, res) => {
   res.json({ success: true, result });
 });
 
-// Antigravity Hook Bypass Report Endpoint
 app.post('/api/report-bypass', (req, res) => {
   const { event, data } = req.body;
   if (event === 'anomaly_detected') {
@@ -421,7 +404,6 @@ app.post('/api/report-bypass', (req, res) => {
   res.json({ accepted: true });
 });
 
-// Kill Switch
 app.post('/api/kill-switch', (req, res) => {
   console.log('\x1b[41m\x1b[37m[KILL SWITCH] EMERGENCY ACTIVATED. REVOKING ALL TOKENS.\x1b[0m');
   systemStatus = 'EMERGENCY_SHUTDOWN';
@@ -446,7 +428,6 @@ app.post('/api/kill-switch', (req, res) => {
   res.json({ success: true, message: 'Emergency Kill Switch completed.', flushed: flushedCount });
 });
 
-// Reset System
 app.post('/api/reset', (req, res) => {
   systemStatus = 'ACTIVE';
   registry.flush();
@@ -463,7 +444,6 @@ app.post('/api/reset', (req, res) => {
   res.json({ success: true });
 });
 
-// Cryptographic Verification of the Log Audit Chain
 app.get('/api/audit/verify', (req, res) => {
   let isChainValid = true;
   let faultIndex = -1;
@@ -471,21 +451,18 @@ app.get('/api/audit/verify', (req, res) => {
   for (let i = 0; i < auditChain.length; i++) {
     const entry = auditChain[i];
     
-    // Check genesis block previous hash
     if (i === 0 && entry.previousHash !== '0') {
       isChainValid = false;
       faultIndex = 0;
       break;
     }
     
-    // Check previous link validation
     if (i > 0 && entry.previousHash !== auditChain[i - 1].hash) {
       isChainValid = false;
       faultIndex = i;
       break;
     }
 
-    // Recompute Hash to verify integrity
     const dataStr = JSON.stringify(entry.data);
     const recomputedHash = crypto.createHash('sha256')
       .update(entry.action + dataStr + entry.timestamp + entry.previousHash)
@@ -501,7 +478,6 @@ app.get('/api/audit/verify', (req, res) => {
   const tailHash = auditChain.length > 0 ? auditChain[auditChain.length - 1].hash : '0';
   const preciseTimestamp = new Date().toISOString();
   
-  // Create cryptographic proof tag signed with Server Secret
   const proofSignature = crypto.createHmac('sha256', SERVER_SECRET)
     .update(tailHash + preciseTimestamp + isChainValid)
     .digest('hex');
@@ -517,7 +493,6 @@ app.get('/api/audit/verify', (req, res) => {
   });
 });
 
-// Policy Config Endpoints
 app.get('/api/policies', (req, res) => {
   res.json({
     currentVersion: currentPolicyVersion,
@@ -563,7 +538,6 @@ app.post('/api/policies/rollback', (req, res) => {
   res.json({ success: true, activeVersion: currentPolicyVersion });
 });
 
-// Status Info
 app.get('/api/status', (req, res) => {
   res.json({
     status: systemStatus,
@@ -573,12 +547,10 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Fallback to React router for SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
 });
 
-// WebSocket Server Handshake
 wss.on('connection', (ws) => {
   console.log('[WebSocket] Client connected (React Dashboard)');
   
