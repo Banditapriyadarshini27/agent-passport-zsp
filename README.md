@@ -1,3 +1,11 @@
+---
+title: Agent-Passport ZSP
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # Agent-Passport
 
 A Zero-Standing-Privilege (ZSP) governance and identity middleware for multi-agent systems. Built for the **AI Agents Intensive Vibe Coding Course ('Agents for Business' track)**.
@@ -112,7 +120,7 @@ npm run requestor [scenario]
 ```
 Where `[scenario]` is one of:
 - `authorized` : Runs a successful, validated tool call.
-- `bypass`     : Tries to execute the tool directly. The Antigravity Hook intercepts and reports a critical alert.
+- `bypass`     : Tries to execute the tool directly. The Antigravity Hook interrupts, terminates the execution, and fires a red bypass alarm.
 - `anomaly`    : Attempts to write containing an `rm -rf` payload. Checked and blocked at the Gateway.
 - `governance` : Attempts path traversal outside of the workspace directory.
 
